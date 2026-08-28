@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="rw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travolium Business</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f6f9; margin: 0; padding: 0; }
+        .container { max-width: 450px; margin: 40px auto; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #333; }
+        input, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; margin-top: 10px; }
+        button:hover { background: #218838; }
+        .hidden { display: none; }
+        .card { background: #e9ecef; padding: 15px; border-radius: 5px; margin-bottom: 15px; }
+        .video-box { background: #000; color: #fff; padding: 20px; text-align: center; border-radius: 5px; margin: 10px 0; }
+        .alert { color: #d9534f; font-size: 14px; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Travolium Business</h2>
+
+    <!-- Abalikiye batariyandikisha / Login cyangwa Register -->
+    <div id="auth-section">
+        <div id="login-form">
+            <h3>Injira (Login)</h3>
+            <input type="text" id="login-phone" placeholder="Nimero ya Telefoni">
+            <input type="password" id="login-password" placeholder="Ijambo ry'ibanga (Password)">
+            <button onclick="loginUser()">Injira</button>
+            <p style="text-align:center; margin-top:15px;">Ufite konti? Oya, <a href="#" onclick="toggleForm('register')">Iyandikishe hano</a></p>
+        </div>
+
+        <div id="register-form" class="hidden">
+            <h3>Iyandikishe (Register)</h3>
+            <input type="text" id="reg-name" placeholder="Amazina yawe Yose">
+            <input type="text" id="reg-phone" placeholder="Nimero ya Telefoni">
+            <input type="password" id="reg-password" placeholder="Ijambo ry'ibanga (Password)">
+            <button onclick="registerUser()">Komezawishyure</button>
+            <p style="text-align:center; margin-top:15px;">Ufite konti? <a href="#" onclick="toggleForm('login')">Injira hano</a></p>
+        </div>
+    </div>
+
+    <!-- Agace ko Kwishyura Kwiyandikisha (4700 RWF) -->
+    <div id="payment-section" class="hidden">
+        <h3>Kwishyura Kwiyandikisha</h3>
+        <div class="card">
+            <p><strong>Igiciro cyo kwiyandikisha:</strong> 4,700 RWF</p>
+            <p><strong>Uburyo:</strong> Momo Pay</p>
+            <p><strong>Momo Pay Code:</strong> <span style="color:red; font-size:18px;">2236574</span></p>
+            <p><strong>Amazina:</strong> Pauline</p>
+        </div>
+        <p>Nyuma yo kwishyura kuri Momo Pay, andika nimero wakoresheje wishyura maze ukande "Emeza ko Wishyure"</p>
+        <input type="text" id="pay-phone" placeholder="Nimero wishyuriyeho">
+        <button onclick="submitPayment()">Emeza ko Wishyuye</button>
+    </div>
+
+    <!-- Agane ko Tegereza Admin Approval -->
+    <div id="pending-section" class="hidden" style="text-align: center;">
+        <h3>Ubusabe bwawe bwakiriwe!</h3>
+        <p class="alert">Tegereza ko Admin yemeza (approve) ubwishyu bwawe kugira ngo winjire muri konti yawe.</p>
+        <button onclick="checkStatusong()">Ongera Usure</button>
+    </div>
+
+    <!-- Dashboard Nyirizina (Video, Balance, Kubitsa, Kubikuza) -->
+    <div id="dashboard-section" class="hidden">
+        <div class="card">
+            <h4>Ikaze, <span id="user-display-name"></span></h4>
+            <p><strong>Balance:</strong> <span id="user-balance">0</span> RWF</p>
+            <p style="color: green; font-size: 14px;">Bonus yo kwiyandikisha yinjijwe: 17,500 RWF</p>
+        </div>
+
+        <div class="card">
+            <h4>Ikoresha Imari (Wallet)</h4>
+            <input type="number" id="trans-amount" placeholder="Amafaranga mu RWF">
+            <button onclick="depositMoney()" style="background: #007bff;">Kubitsa (Deposit)</button>
+            <button onclick="withdrawMoney()" style="background: #ffc107; color:black;">Kubikuza (Withdraw)</button>
+        </div>
+
+        <div class="card">
+            <h4>Aka Kare K'Amavidiyo</h4>
+            <div class="video-box">
+                <p>🎬 Vidiyo yo kureba</p>
+                <button onclick="watchVideo()" style="background: #17a2b8;">Reba Vidiyo Uhembwe</button>
+            </div>
+        </div>
+        <button onclick="logout()" style="background: #dc3545;">Sohoka (Logout)</button>
+    </div>
+</div>
+
+<script>
+    // Gukoresha LocalStorage nka Database y'ibanze kuri iyi prototype
+    function getUsers() { return JSON.parse(localStorage.getItem('travolium_users')) || []; }
+    function saveUsers(users) { localStorage.setItem('travolium_users', JSON.stringify(users)); }
+
+    function toggleForm(type) {
+        if(type === 'register') {
+            document.getElementById('login-form').classList.add('hidden');
+            document.getElementById('register-form').classList.remove('hidden');
+        } else {
+            document.getElementById('register-form').classList.add('hidden');
+            document.getElementById('login-form').classList.remove('hidden');
+        }
+    }
+
+    function registerUser() {
+        let name = document.getElementById('reg-name').value;
+        let phone = document.getElementById('reg-phone').value;
+        let password = document.getElementById('reg-password').value;
+
+        if(!name || !phone || !password) { alert("Uzuza ibisabwa byose!"); return; }
+
+        let users = getUsers();
+        if(users.some(u => u.phone === phone)) { alert("Iyi nimero isanzwe ifite konti!"); return; }
+
+        let newUser = {
+            name, phone, password,
+            status: 'unpaid', // unpaid, pending, approved
+            balance: 17500 // Bonus yo kwiyandikisha
+        };
+
+        users.push(newUser);
+        saveUsers(users);
+        localStorage.setItem('currentUser', phone);
+
+        document.getElementById('auth-section').classList.add('hidden');
+        document.getElementById('payment-section').classList.remove('hidden');
+    }
+
+    function submitPayment() {
+        let phone = localStorage.getItem('currentUser');
+        let users = getUsers();
+        let user = users.find(u => u.phone === phone);
+        if(user) {
+            user.status = 'pending';
+            saveUsers(users);
+            document.getElementById('payment-section').classList.add('hidden');
+            document.getElementById('pending-section').classList.remove('hidden');
+        }
+    }
+
+    function checkStatusong() {
+        let phone = localStorage.getItem('currentUser');
+        let users = getUsers();
+        let user = users.find(u => u.phone === phone);
+        if(user && user.status === 'approved') {
+            loadDashboard(user);
+        } else {
+            alert("Admin aracyasuzuma ubwishyu bwawe, tegereza gato.");
+        }
+    }
+
+    function loginUser() {
+        let phone = document.getElementById('login-phone').value;
+        let password = document.getElementById('login-password').value;
+        let users = getUsers();
+        let user = users.find(u => u.phone === phone && u.password === password);
+
+        if(!user) { alert("Nimero cyangwa ijambo ry'ibanga sibyo!"); return; }
+
+        localStorage.setItem('currentUser', phone);
+        if(user.status === 'approved') {
+            loadDashboard(user);
+        } else if(user.status === 'pending') {
+            document.getElementById('auth-section').classList.add('hidden');
+            document.getElementById('pending-section').classList.remove('hidden');
+        } else {
+            document.getElementById('auth-section').classList.add('hidden');
+            document.getElementById('payment-section').classList.remove('hidden');
+        }
+    }
+
+    function loadDashboard(user) {
+        document.getElementById('auth-section').classList.add('hidden');
+        document.getElementById('payment-section').classList.add('hidden');
+        document.getElementById('pending-section').classList.add('hidden');
+        document.getElementById('dashboard-section').classList.remove('hidden');
+
+        document.getElementById('user-display-name').innerText = user.name;
+        document.getElementById('user-balance').innerText = user.balance;
+    }
+
+    function depositMoney() {
+        let amount = parseFloat(document.getElementById('trans-amount').value);
+        if(!amount || amount <=0) { alert("Andika umubare w'amafaranga nyayo!"); return; }
+        let phone = localStorage.getItem('currentUser');
+        let users = getUsers();
+        let user = users.find(u => u.phone === phone);
+        user.balance += amount;
+        saveUsers(users);
+        loadDashboard(user);
+        alert("Wubitse neza!");
+    }
+
+    function withdrawMoney() {
+        let amount = parseFloat(document.getElementById('trans-amount').value);
+        let phone = localStorage.getItem('currentUser');
+        let users = getUsers();
+        let user = users.find(u => u.phone === phone);
+        if(!amount || amount > user.balance) { alert("Ntibishoboka: Amafaranga afite ni make cyangwa wanditse nabi."); return; }
+        user.balance -= amount;
+        saveUsers(users);
+        loadDashboard(user);
+        alert("Ubusabe bwo kubikuza bwakiriwe!");
+    }
+
+    function watchVideo() {
+        let phone = localStorage.getItem('currentUser');
+        let users = getUsers();
+        let user = users.find(u => u.phone === phone);
+        user.balance += 200; // Ihembo rya vidiyo
+        saveUsers(users);
+        loadDashboard(user);
+        alert("Warebye vidiyo! Uhawemo 200 RWF.");
+    }
+
+    function logout() {
+        localStorage.removeItem('currentUser');
+        location.reload();
+    }
+
+    // Auto check session
+    window.onload = function() {
+        let phone = localStorage.getItem('currentUser');
+        if(phone) {
+            let users = getUsers();
+            let user = users.find(u => u.phone === phone);
+            if(user && user.status === 'approved') loadDashboard(user);
+        }
+    }
+</script>
+
+</body>
+</html>
