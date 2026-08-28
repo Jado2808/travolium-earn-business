@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="rw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Travolium Business</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #343a40; color: #fff; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: #495057; padding: 20px; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #fff; color: #000; }
+        th, td { padding: 10px; border: 1px solid #ddd; text-align: left; }
+        th { background: #007bff; color: white; }
+        button { padding: 6px 12px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #218838; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Travolium Business - Admin Dashboard</h2>
+    <h3>Abayandikishe bategereje Kwemezwa (Approval)</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Amazina</th>
+                <th>Nimero ya Telefoni</th>
+                <th>Status</th>
+                <th>Igikorwa</th>
+            </tr>
+        <span id="admin-table"></span>
+        </thead>
+        <tbody id="user-rows">
+            <!-- Data zizinjiramo hano na JavaScript -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function loadAdminPanel() {
+        let users = JSON.parse(localStorage.getItem('travolium_users')) || [];
+        let tbody = document.getElementById('user-rows');
+        tbody.innerHTML = '';
+
+        users.forEach((user, index) => {
+            if(user.status === 'pending') {
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${user.name}</td>
+                    <td>${user.phone}</td>
+                    <td style="color:orange; font-weight:bold;">Tegereje Kwemezwa</td>
+                    <td><button onclick="approveUser(${index})">Yemeze (Approve)</button></td>
+                `;
+                tbody.appendChild(tr);
+            }
+        });
+    }
+
+    function approveUser(index) {
+        let users = JSON.parse(localStorage.getItem('travolium_users')) || [];
+        users[index].status = 'approved';
+        localStorage.setItem('travolium_users', JSON.stringify(users));
+        alert("Konti yemejwe neza!");
+        loadAdminPanel();
+    }
+
+    window.onload = loadAdminPanel;
+</script>
+
+</body>
+</html>
