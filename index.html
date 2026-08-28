@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="rw">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,6 +11,8 @@
         input, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
         button { width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; margin-top: 10px; }
         button:hover { background: #218838; }
+        .btn-secondary { background: #6c75d6; margin-top: 5px; }
+        .btn-secondary:hover { background: #5a6268; }
         .hidden { display: none; }
         .card { background: #e9ecef; padding: 15px; border-radius: 5px; margin-bottom: 15px; }
         .video-box { background: #000; color: #fff; padding: 20px; text-align: center; border-radius: 5px; margin: 10px 0; }
@@ -22,75 +24,76 @@
 <div class="container">
     <h2>Travolium Business</h2>
 
-    <!-- Abalikiye batariyandikisha / Login cyangwa Register -->
+    <!-- Authentication Section (Login & Register) -->
     <div id="auth-section">
         <div id="login-form">
-            <h3>Injira (Login)</h3>
-            <input type="text" id="login-phone" placeholder="Nimero ya Telefoni">
-            <input type="password" id="login-password" placeholder="Ijambo ry'ibanga (Password)">
-            <button onclick="loginUser()">Injira</button>
-            <p style="text-align:center; margin-top:15px;">Ufite konti? Oya, <a href="#" onclick="toggleForm('register')">Iyandikishe hano</a></p>
+            <h3>Login to Your Account</h3>
+            <input type="text" id="login-phone" placeholder="Phone Number">
+            <input type="password" id="login-password" placeholder="Password">
+            <button onclick="loginUser()">Login</button>
+            <p style="text-align:center; margin-top:15px;">Don't have an account? <a href="#" onclick="toggleForm('register')">Register here</a></p>
         </div>
 
         <div id="register-form" class="hidden">
-            <h3>Iyandikishe (Register)</h3>
-            <input type="text" id="reg-name" placeholder="Amazina yawe Yose">
-            <input type="text" id="reg-phone" placeholder="Nimero ya Telefoni">
-            <input type="password" id="reg-password" placeholder="Ijambo ry'ibanga (Password)">
-            <button onclick="registerUser()">Komezawishyure</button>
-            <p style="text-align:center; margin-top:15px;">Ufite konti? <a href="#" onclick="toggleForm('login')">Injira hano</a></p>
+            <h3>Create an Account</h3>
+            <input type="text" id="reg-name" placeholder="Full Name">
+            <input type="text" id="reg-phone" placeholder="Phone Number">
+            <input type="password" id="reg-password" placeholder="Password">
+            <button onclick="registerUser()">Proceed to Payment</button>
+            <p style="text-align:center; margin-top:15px;">Already have an account? <a href="#" onclick="toggleForm('login')">Login here</a></p>
         </div>
     </div>
 
-    <!-- Agace ko Kwishyura Kwiyandikisha (4700 RWF) -->
+    <!-- Registration Payment Section (4700 RWF) -->
     <div id="payment-section" class="hidden">
-        <h3>Kwishyura Kwiyandikisha</h3>
+        <h3>Registration Payment</h3>
         <div class="card">
-            <p><strong>Igiciro cyo kwiyandikisha:</strong> 4,700 RWF</p>
-            <p><strong>Uburyo:</strong> Momo Pay</p>
+            <p><strong>Registration Fee:</strong> 4,700 RWF</p>
+            <p><strong>Method:</strong> Momo Pay</p>
             <p><strong>Momo Pay Code:</strong> <span style="color:red; font-size:18px;">2236574</span></p>
-            <p><strong>Amazina:</strong> Pauline</p>
+            <p><strong>Account Name:</strong> Pauline</p>
         </div>
-        <p>Nyuma yo kwishyura kuri Momo Pay, andika nimero wakoresheje wishyura maze ukande "Emeza ko Wishyure"</p>
-        <input type="text" id="pay-phone" placeholder="Nimero wishyuriyeho">
-        <button onclick="submitPayment()">Emeza ko Wishyuye</button>
+        <p>After paying via Momo Pay, enter the phone number you used to pay and click "Confirm Payment"</p>
+        <input type="text" id="pay-phone" placeholder="Payment Phone Number">
+        <button onclick="submitPayment()">Confirm Payment</button>
+        <button class="btn-secondary" onclick="goBackToAuth()">Back</button>
     </div>
 
-    <!-- Agane ko Tegereza Admin Approval -->
+    <!-- Pending Admin Approval Section -->
     <div id="pending-section" class="hidden" style="text-align: center;">
-        <h3>Ubusabe bwawe bwakiriwe!</h3>
-        <p class="alert">Tegereza ko Admin yemeza (approve) ubwishyu bwawe kugira ngo winjire muri konti yawe.</p>
-        <button onclick="checkStatusong()">Ongera Usure</button>
+        <h3>Your Request Has Been Received!</h3>
+        <p class="alert">Please wait for the Admin to approve your payment so you can access your account.</p>
+        <button onclick="checkStatus()">Check Status</button>
+        <button class="btn-secondary" onclick="goBackToAuth()">Back to Login</button>
     </div>
 
-    <!-- Dashboard Nyirizina (Video, Balance, Kubitsa, Kubikuza) -->
+    <!-- Main Dashboard Section (Video, Balance, Deposit, Withdraw) -->
     <div id="dashboard-section" class="hidden">
         <div class="card">
-            <h4>Ikaze, <span id="user-display-name"></span></h4>
+            <h4>Welcome, <span id="user-display-name"></span></h4>
             <p><strong>Balance:</strong> <span id="user-balance">0</span> RWF</p>
-            <p style="color: green; font-size: 14px;">Bonus yo kwiyandikisha yinjijwe: 17,500 RWF</p>
+            <p style="color: green; font-size: 14px;">Registration Bonus Added: 17,500 RWF</p>
         </div>
 
         <div class="card">
-            <h4>Ikoresha Imari (Wallet)</h4>
-            <input type="number" id="trans-amount" placeholder="Amafaranga mu RWF">
-            <button onclick="depositMoney()" style="background: #007bff;">Kubitsa (Deposit)</button>
-            <button onclick="withdrawMoney()" style="background: #ffc107; color:black;">Kubikuza (Withdraw)</button>
+            <h4>Wallet Management</h4>
+            <input type="number" id="trans-amount" placeholder="Amount in RWF">
+            <button onclick="depositMoney()" style="background: #007bff;">Deposit</button>
+            <button onclick="withdrawMoney()" style="background: #ffc107; color:black;">Withdraw</button>
         </div>
 
         <div class="card">
-            <h4>Aka Kare K'Amavidiyo</h4>
+            <h4>Video Section</h4>
             <div class="video-box">
-                <p>🎬 Vidiyo yo kureba</p>
-                <button onclick="watchVideo()" style="background: #17a2b8;">Reba Vidiyo Uhembwe</button>
+                <p>🎬 Watch & Earn Video</p>
+                <button onclick="watchVideo()" style="background: #17a2b8;">Watch Video & Earn</button>
             </div>
         </div>
-        <button onclick="logout()" style="background: #dc3545;">Sohoka (Logout)</button>
+        <button onclick="logout()" style="background: #dc3545;">Logout</button>
     </div>
 </div>
 
 <script>
-    // Gukoresha LocalStorage nka Database y'ibanze kuri iyi prototype
     function getUsers() { return JSON.parse(localStorage.getItem('travolium_users')) || []; }
     function saveUsers(users) { localStorage.setItem('travolium_users', JSON.stringify(users)); }
 
@@ -104,20 +107,28 @@
         }
     }
 
+    function goBackToAuth() {
+        document.getElementById('payment-section').classList.add('hidden');
+        document.getElementById('pending-section').classList.add('hidden');
+        document.getElementById('auth-section').classList.remove('hidden');
+        document.getElementById('login-form').classList.remove('hidden');
+        document.getElementById('register-form').classList.add('hidden');
+    }
+
     function registerUser() {
         let name = document.getElementById('reg-name').value;
         let phone = document.getElementById('reg-phone').value;
         let password = document.getElementById('reg-password').value;
 
-        if(!name || !phone || !password) { alert("Uzuza ibisabwa byose!"); return; }
+        if(!name || !phone || !password) { alert("Please fill in all fields!"); return; }
 
         let users = getUsers();
-        if(users.some(u => u.phone === phone)) { alert("Iyi nimero isanzwe ifite konti!"); return; }
+        if(users.some(u => u.phone === phone)) { alert("This phone number already has an account!"); return; }
 
         let newUser = {
             name, phone, password,
-            status: 'unpaid', // unpaid, pending, approved
-            balance: 17500 // Bonus yo kwiyandikisha
+            status: 'unpaid',
+            balance: 17500
         };
 
         users.push(newUser);
@@ -140,14 +151,14 @@
         }
     }
 
-    function checkStatusong() {
+    function checkStatus() {
         let phone = localStorage.getItem('currentUser');
         let users = getUsers();
         let user = users.find(u => u.phone === phone);
         if(user && user.status === 'approved') {
             loadDashboard(user);
         } else {
-            alert("Admin aracyasuzuma ubwishyu bwawe, tegereza gato.");
+            alert("Admin is still reviewing your payment, please wait.");
         }
     }
 
@@ -157,7 +168,7 @@
         let users = getUsers();
         let user = users.find(u => u.phone === phone && u.password === password);
 
-        if(!user) { alert("Nimero cyangwa ijambo ry'ibanga sibyo!"); return; }
+        if(!user) { alert("Incorrect phone number or password!"); return; }
 
         localStorage.setItem('currentUser', phone);
         if(user.status === 'approved') {
@@ -183,14 +194,14 @@
 
     function depositMoney() {
         let amount = parseFloat(document.getElementById('trans-amount').value);
-        if(!amount || amount <=0) { alert("Andika umubare w'amafaranga nyayo!"); return; }
+        if(!amount || amount <= 0) { alert("Please enter a valid amount!"); return; }
         let phone = localStorage.getItem('currentUser');
         let users = getUsers();
         let user = users.find(u => u.phone === phone);
         user.balance += amount;
         saveUsers(users);
         loadDashboard(user);
-        alert("Wubitse neza!");
+        alert("Deposit successful!");
     }
 
     function withdrawMoney() {
@@ -198,21 +209,21 @@
         let phone = localStorage.getItem('currentUser');
         let users = getUsers();
         let user = users.find(u => u.phone === phone);
-        if(!amount || amount > user.balance) { alert("Ntibishoboka: Amafaranga afite ni make cyangwa wanditse nabi."); return; }
+        if(!amount || amount > user.balance) { alert("Insufficient balance or invalid amount."); return; }
         user.balance -= amount;
         saveUsers(users);
         loadDashboard(user);
-        alert("Ubusabe bwo kubikuza bwakiriwe!");
+        alert("Withdrawal request submitted successfully!");
     }
 
     function watchVideo() {
         let phone = localStorage.getItem('currentUser');
         let users = getUsers();
         let user = users.find(u => u.phone === phone);
-        user.balance += 200; // Ihembo rya vidiyo
+        user.balance += 200;
         saveUsers(users);
         loadDashboard(user);
-        alert("Warebye vidiyo! Uhawemo 200 RWF.");
+        alert("You watched the video and earned 200 RWF!");
     }
 
     function logout() {
@@ -220,7 +231,6 @@
         location.reload();
     }
 
-    // Auto check session
     window.onload = function() {
         let phone = localStorage.getItem('currentUser');
         if(phone) {
