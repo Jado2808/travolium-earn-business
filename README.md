@@ -1,2 +1,2 @@
-# affiliate-marketing-platform-1
-Digital affiliate marketing platform 
+# Travolium Business
+Travolium Earn Business Platform
