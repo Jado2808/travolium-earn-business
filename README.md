@@ -1,2 +1,2 @@
-# travolium business
-travolium earn nusiness platform app
+# Travolium Business
+Travolium Earn Business Platform
