@@ -1,2 +1,2 @@
 # Travolium Business
-Travolium Earn Business Platform
+Travolium Earn Business Platform app
